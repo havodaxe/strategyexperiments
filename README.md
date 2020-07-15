@@ -1,10 +1,15 @@
 # strategyexperiments
 Prototyping for a strategy RPG
 
+## Secondary tools
+GIMP is used to edit XCF files https://www.gimp.org/
+
+Map files are made with Tiled map editor https://www.mapeditor.org/
+
 ## Copyright and attribution
 This code is licensed under GNU General Public License **version 3.0 only**, contained in the file `LICENSE`
 
-Additionally, some files are licensed under creative commons:
+Additionally, some files are licensed under their respective creative commons licenses:
 
 `assets/external/overworld_tiles_by_kemono.png` [Overworld tiles](https://opengameart.org/content/overworld-tiles-1) by [Kemono](https://opengameart.org/users/kemono) is licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
 
