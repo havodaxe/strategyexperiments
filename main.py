@@ -11,6 +11,8 @@ class TileMap():
     board_width = None
     tileset_path = None
     keycolor = None
+    tileset_columns = None
+    tileset_tilecount = None
     def __init__(self):
         # Mostly just to keep the file object out of scope
         mapfile = open(f"{map_dir}/{map_name}")
@@ -19,6 +21,8 @@ class TileMap():
         self.board_width = attribute_tree["width"]
         self.tileset_path = attribute_tree["tilesets"][0]["image"]
         self.keycolor = attribute_tree["tilesets"][0]["transparentcolor"]
+        self.tileset_columns = attribute_tree["tilesets"][0]["columns"]
+        self.tileset_tilecount = attribute_tree["tilesets"][0]["tilecount"]
         mapfile.close()
 
 def main():
@@ -35,14 +39,16 @@ def main():
     # or color keying won't work.
     tilesheet.set_colorkey(pygame.Color(tilemap.keycolor))
 
+    # Slice tilesheet into an array of tiles
     tilegfx = []
+    for tile_id in range(tilemap.tileset_tilecount):
+        tilecoord = (tile_id % tilemap.tileset_columns,
+                     tile_id // tilemap.tileset_columns)
+        # This is kind of silly when the tileset is only one row
+        tile_px_pos = (tilecoord[0] * 16, tilecoord[1] * 16)
+        tilegfx.append(tilesheet.subsurface(pygame.Rect(*tile_px_pos,16,16)))
 
-    tilegfx.append(tilesheet.subsurface(pygame.Rect(0,0,16,16)))
-    tilegfx.append(tilesheet.subsurface(pygame.Rect(16,0,16,16)))
-    tilegfx.append(tilesheet.subsurface(pygame.Rect(32,0,16,16)))
-    tilegfx.append(tilesheet.subsurface(pygame.Rect(48,0,16,16)))
-    # TODO: Make this into a loop
-
+    # Draw tiles to screen
     for tile_index in range(len(tilemap.tile_ids)):
         tilecoord = (tile_index % tilemap.board_width,
                      tile_index // tilemap.board_width)
