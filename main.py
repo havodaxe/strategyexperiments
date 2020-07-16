@@ -4,16 +4,22 @@ import pygame
 import json
 
 map_dir = "assets/maps"
+map_name = "map00.json"
 
-def loadmap():
-    # Mostly just to keep the file object out of scope
-    mapfile = open(f"{map_dir}/map00.json")
-    tilemap = json.load(mapfile)
-    tile_ids = tilemap["layers"][0]["data"]
-    board_width = tilemap["width"]
-    mapfile.close()
-    return tile_ids, board_width
-    pass
+class TileMap():
+    tile_ids = None
+    board_width = None
+    tileset_path = None
+    keycolor = None
+    def __init__(self):
+        # Mostly just to keep the file object out of scope
+        mapfile = open(f"{map_dir}/{map_name}")
+        attribute_tree = json.load(mapfile)
+        self.tile_ids = attribute_tree["layers"][0]["data"]
+        self.board_width = attribute_tree["width"]
+        self.tileset_path = attribute_tree["tilesets"][0]["image"]
+        self.keycolor = attribute_tree["tilesets"][0]["transparentcolor"]
+        mapfile.close()
 
 def main():
     pygame.init()
@@ -21,13 +27,13 @@ def main():
     # 20x15 tiles when tiles are 16px x 16px
     screen = pygame.display.set_mode(window_size)
 
-    tile_ids, board_width = loadmap()
-    tilesheet = pygame.image.load(f"{map_dir}/tilesets/tileset00.png")
+    tilemap = TileMap()
+
+    tilesheet = pygame.image.load(f"{map_dir}/{tilemap.tileset_path}")
     tilesheet.convert()
     # Make sure the image being used does *not* have an alpha channel
     # or color keying won't work.
-    tilesheet.set_colorkey(pygame.Color(255,0,255))
-    # Eye-searing magenta
+    tilesheet.set_colorkey(pygame.Color(tilemap.keycolor))
 
     tilegfx = []
 
@@ -37,13 +43,12 @@ def main():
     tilegfx.append(tilesheet.subsurface(pygame.Rect(48,0,16,16)))
     # TODO: Make this into a loop
 
-    for tile_index in range(len(tile_ids)):
-        tilecoord = (tile_index % board_width,
-                     tile_index // board_width)
-        screen.blit(tilegfx[tile_ids[tile_index] - 1],
+    for tile_index in range(len(tilemap.tile_ids)):
+        tilecoord = (tile_index % tilemap.board_width,
+                     tile_index // tilemap.board_width)
+        screen.blit(tilegfx[tilemap.tile_ids[tile_index] - 1],
                             (tilecoord[0] * 16, tilecoord[1] * 16))
         # Tiled is sort of 1-indexed because 0 is the built-in blank tile
-    print(tilecoord)
     clock = pygame.time.Clock()
     pygame.display.flip()
     # Updates the screen, very important
