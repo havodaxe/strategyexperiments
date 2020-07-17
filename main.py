@@ -9,6 +9,8 @@ map_name = "map00.json"
 class TileMap():
     tile_ids = None
     board_width = None
+    tile_width = None
+    tile_height = None
     tileset_path = None
     keycolor = None
     tileset_columns = None
@@ -19,6 +21,8 @@ class TileMap():
         attribute_tree = json.load(mapfile)
         self.tile_ids = attribute_tree["layers"][0]["data"]
         self.board_width = attribute_tree["width"]
+        self.tile_width = attribute_tree["tilewidth"]
+        self.tile_height = attribute_tree["tileheight"]
         self.tileset_path = attribute_tree["tilesets"][0]["image"]
         self.keycolor = attribute_tree["tilesets"][0]["transparentcolor"]
         self.tileset_columns = attribute_tree["tilesets"][0]["columns"]
@@ -32,6 +36,8 @@ def main():
     screen = pygame.display.set_mode(window_size)
 
     tilemap = TileMap()
+    tile_width = tilemap.tile_width
+    tile_height = tilemap.tile_height
 
     tilesheet = pygame.image.load(f"{map_dir}/{tilemap.tileset_path}")
     tilesheet.convert()
@@ -45,15 +51,18 @@ def main():
         tilecoord = (tile_id % tilemap.tileset_columns,
                      tile_id // tilemap.tileset_columns)
         # This is kind of silly when the tileset is only one row
-        tile_px_pos = (tilecoord[0] * 16, tilecoord[1] * 16)
-        tilegfx.append(tilesheet.subsurface(pygame.Rect(*tile_px_pos,16,16)))
+        tile_px_pos = (tilecoord[0] * tile_width, tilecoord[1] * tile_height)
+        tilegfx.append(tilesheet.subsurface(pygame.Rect(*tile_px_pos,
+                                                        tile_width,
+                                                        tile_height)))
 
     # Draw tiles to screen
     for tile_index in range(len(tilemap.tile_ids)):
         tilecoord = (tile_index % tilemap.board_width,
                      tile_index // tilemap.board_width)
         screen.blit(tilegfx[tilemap.tile_ids[tile_index] - 1],
-                            (tilecoord[0] * 16, tilecoord[1] * 16))
+                            (tilecoord[0] * tile_width,
+                             tilecoord[1] * tile_height))
         # Tiled is sort of 1-indexed because 0 is the built-in blank tile
     clock = pygame.time.Clock()
     pygame.display.flip()
