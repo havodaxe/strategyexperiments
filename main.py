@@ -15,18 +15,23 @@ class TileMap():
     keycolor = None
     tileset_columns = None
     tileset_tilecount = None
+    surface = None
     def __init__(self):
         # Mostly just to keep the file object out of scope
         mapfile = open(f"{map_dir}/{map_name}")
         attribute_tree = json.load(mapfile)
         self.tile_ids = attribute_tree["layers"][0]["data"]
         self.board_width = attribute_tree["width"]
+        self.board_height = attribute_tree["height"]
         self.tile_width = attribute_tree["tilewidth"]
         self.tile_height = attribute_tree["tileheight"]
         self.tileset_path = attribute_tree["tilesets"][0]["image"]
         self.keycolor = attribute_tree["tilesets"][0]["transparentcolor"]
         self.tileset_columns = attribute_tree["tilesets"][0]["columns"]
         self.tileset_tilecount = attribute_tree["tilesets"][0]["tilecount"]
+        self.surface = pygame.Surface((self.board_width * self.tile_width,
+                                       self.board_height * self.tile_height))
+        self.surface.convert()
         mapfile.close()
 
 def main():
@@ -60,11 +65,12 @@ def main():
     for tile_index in range(len(tilemap.tile_ids)):
         tilecoord = (tile_index % tilemap.board_width,
                      tile_index // tilemap.board_width)
-        screen.blit(tilegfx[tilemap.tile_ids[tile_index] - 1],
-                            (tilecoord[0] * tile_width,
-                             tilecoord[1] * tile_height))
+        tilemap.surface.blit(tilegfx[tilemap.tile_ids[tile_index] - 1],
+                             (tilecoord[0] * tile_width,
+                              tilecoord[1] * tile_height))
         # Tiled is sort of 1-indexed because 0 is the built-in blank tile
     clock = pygame.time.Clock()
+    screen.blit(tilemap.surface, (0,0))
     pygame.display.flip()
     # Updates the screen, very important
 
