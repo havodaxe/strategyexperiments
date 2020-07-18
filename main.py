@@ -5,6 +5,10 @@ import json
 
 map_dir = "assets/maps"
 map_name = "map00.json"
+sprite_dir = "assets/sprites"
+sprite_name = "assets/sprite00.png"
+sprite_keycolor = (255, 0, 255)
+# Eye-searing magenta
 
 class TileMap():
     tile_ids = None
@@ -69,10 +73,10 @@ def main():
                              (tilecoord[0] * tile_width,
                               tilecoord[1] * tile_height))
         # Tiled is sort of 1-indexed because 0 is the built-in blank tile
+    sprite = pygame.image.load("assets/sprites/sprite00.png")
+    sprite.convert()
+    sprite.set_colorkey(pygame.Color(*sprite_keycolor))
     clock = pygame.time.Clock()
-    screen.blit(tilemap.surface, (0,0))
-    pygame.display.flip()
-    # Updates the screen, very important
 
     while(True):
         clock.tick(60)
@@ -81,6 +85,13 @@ def main():
                event.type == pygame.KEYDOWN and
                event.key == pygame.K_ESCAPE):
                 exit()
+            if(event.type == pygame.MOUSEBUTTONDOWN):
+                if(event.button == 3): # Right mouse click
+                    print(event.pos)
+        screen.blit(tilemap.surface, (0,0))
+        screen.blit(sprite, (128,96))
+        pygame.display.flip()
+        # Updates the screen, very important
 
 if(__name__ == "__main__"):
     main()
