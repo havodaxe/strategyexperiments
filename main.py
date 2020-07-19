@@ -9,6 +9,8 @@ sprite_dir = "assets/sprites"
 sprite_name = "assets/sprite00.png"
 sprite_keycolor = (255, 0, 255)
 # Eye-searing magenta
+scale_factor = 2
+# Non-integer values break window initialisation
 
 class TileMap():
     tile_ids = None
@@ -40,9 +42,12 @@ class TileMap():
 
 def main():
     pygame.init()
-    window_size = w_width, w_height = 320, 240
+    canvas_size = canvas_width, canvas_height = 320, 240
+    window_size = (canvas_width * scale_factor, canvas_height * scale_factor)
     # 20x15 tiles when tiles are 16px x 16px
     screen = pygame.display.set_mode(window_size)
+    canvas = pygame.Surface(canvas_size)
+    canvas.convert()
 
     tilemap = TileMap()
     tile_width = tilemap.tile_width
@@ -65,7 +70,7 @@ def main():
                                                         tile_width,
                                                         tile_height)))
 
-    # Draw tiles to screen
+    # Draw tiles to tilemap surface
     for tile_index in range(len(tilemap.tile_ids)):
         tilecoord = (tile_index % tilemap.board_width,
                      tile_index // tilemap.board_width)
@@ -88,8 +93,10 @@ def main():
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 if(event.button == 3): # Right mouse click
                     print(event.pos)
-        screen.blit(tilemap.surface, (0,0))
-        screen.blit(sprite, (128,96))
+        canvas.blit(tilemap.surface, (0,0))
+        canvas.blit(sprite, (128,96))
+        pygame.transform.scale(canvas, window_size, screen)
+        # Scales canvas onto screen
         pygame.display.flip()
         # Updates the screen, very important
 
