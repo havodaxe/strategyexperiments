@@ -12,6 +12,16 @@ sprite_keycolor = (255, 0, 255)
 scale_factor = 2
 # Non-integer values break window initialisation
 
+class Sprite():
+    surface = None
+    pos = None
+    def __init__(self):
+        self.surface = pygame.image.load("assets/sprites/sprite00.png")
+        self.surface.convert()
+        self.surface.set_colorkey(pygame.Color(*sprite_keycolor))
+        self.pos = (8, 6)
+        pass
+
 class TileMap():
     tile_ids = None
     board_width = None
@@ -78,9 +88,8 @@ def main():
                              (tilecoord[0] * tile_width,
                               tilecoord[1] * tile_height))
         # Tiled is sort of 1-indexed because 0 is the built-in blank tile
-    sprite = pygame.image.load("assets/sprites/sprite00.png")
-    sprite.convert()
-    sprite.set_colorkey(pygame.Color(*sprite_keycolor))
+
+    sprite = Sprite()
     clock = pygame.time.Clock()
 
     while(True):
@@ -91,10 +100,14 @@ def main():
                event.key == pygame.K_ESCAPE):
                 exit()
             if(event.type == pygame.MOUSEBUTTONDOWN):
+                if(event.button == 1): # Left mouse click
+                    sprite.pos = (event.pos[0] // (tile_width * scale_factor),
+                                  event.pos[1] // (tile_height * scale_factor))
                 if(event.button == 3): # Right mouse click
                     print(event.pos)
         canvas.blit(tilemap.surface, (0,0))
-        canvas.blit(sprite, (128,96))
+        canvas.blit(sprite.surface, (sprite.pos[0] * tile_width,
+                                     sprite.pos[1] * tile_height))
         pygame.transform.scale(canvas, window_size, screen)
         # Scales canvas onto screen
         pygame.display.flip()
